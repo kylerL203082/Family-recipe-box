@@ -1,727 +1,1112 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Family Recipe Box</title>
+
 <style>
-:root{font-family:system-ui,Arial,sans-serif;color:#293a2d;background:#f8f5ec}
-*{box-sizing:border-box}
-body{margin:0}
-header{background:#344f3c;color:#fff;padding:30px 20px;text-align:center}
-header h1{font-family:Georgia,serif;font-size:clamp(32px,5vw,56px);margin:0 0 8px}
-header p{margin:0;color:#e9e7d7}
-.wrap{max-width:1100px;margin:auto;padding:26px 18px}
-.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-input,select,textarea,button{font:inherit;padding:12px;border:1px solid #c9cec2;border-radius:9px}
-input,select{min-width:0}
-#search{flex:1;min-width:210px}
-button{cursor:pointer;background:#476c50;color:white;border:0;font-weight:600}
-button:hover{background:#2f5237}
-.ghost{background:#e5ebdf;color:#304a36}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
-.recipe{background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e1e3d9;box-shadow:0 4px 14px #1b31150c;cursor:pointer}
-.recipe .art{height:125px;background:linear-gradient(135deg,#e4dfc6,#d2dfcb);display:grid;place-items:center;font-size:50px}
-.recipe .art img{width:100%;height:125px;object-fit:cover}
-.recipe .content{padding:18px}
-.recipe h3{font-family:Georgia,serif;font-size:23px;margin:0 0 8px}
-.muted{color:#69756b;font-size:14px}
-.tag{display:inline-block;background:#e8eee4;color:#3d6043;border-radius:100px;padding:5px 10px;font-size:12px;margin:10px 0}
-.empty{padding:36px;text-align:center;color:#6b746a}
-dialog{width:min(640px,calc(100% - 24px));max-height:90vh;overflow:auto;border:0;border-radius:16px;padding:26px;box-shadow:0 12px 60px #0003}
-dialog::backdrop{background:#17291a99}
-dialog h2{font-family:Georgia,serif;margin-top:0}
-.form{display:grid;gap:12px}
-.form label{display:grid;gap:5px;font-weight:600}
-.form input,.form textarea,.form select{width:100%}
-textarea{min-height:95px;resize:vertical}
-.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
-.detail{white-space:pre-wrap;line-height:1.6}
-.status{padding:12px;border-radius:9px;background:#edf2e8;margin:0 0 15px}
-.status.error{background:#f9e8e5;color:#8c2d25}
-.photo{width:100%;max-height:350px;object-fit:cover;border-radius:12px}
-.admin-panel{background:#fff;border:1px solid #dce2d8;border-radius:12px;padding:18px;margin:14px 0}
-.request-card{border-bottom:1px solid #e2e7df;padding:14px 0}
-.request-card:last-child{border-bottom:0}
-.request-card p{white-space:pre-wrap}
-.hide{display:none!important}
-footer{text-align:center;padding:40px;color:#748074;font-size:13px}
-@media print{
-header,.toolbar,.actions,footer{display:none}
-dialog{position:static;width:100%;max-height:none;box-shadow:none}
-dialog::backdrop{display:none}
+:root {
+  --green: #365440;
+  --green-dark: #213a2c;
+  --cream: #faf8f2;
+  --sage: #e8eee5;
+  --text: #29372c;
 }
-</style>
-<style id="v4-theme">
-body{background:#fbfaf6;color:#28382e}
-.topnav{height:76px;padding:0 clamp(18px,4vw,64px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9e9e1;background:#fff}
-.brand{font-family:Georgia,serif;color:#34513c;text-decoration:none;font-weight:bold;font-size:19px}
-.topnav button{border-radius:30px;padding:12px 20px}
-.hero{min-height:520px;padding:90px 20px 75px;text-align:center;display:flex;flex-direction:column;align-items:center}
-.hero-mark{font-size:50px;margin-bottom:14px}
-.hero h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(38px,6vw,65px);letter-spacing:-1.5px;margin:0 0 13px;color:#34513c}
-.hero p{margin:0 0 38px;color:#687369;font-size:17px}
-.search-shell{width:min(100%,660px);background:#fff;display:flex;align-items:center;gap:12px;border:1px solid #dadfd7;border-radius:999px;padding:5px 18px;box-shadow:0 5px 22px #1b31150c}
-.search-shell:focus-within{box-shadow:0 6px 28px #1b311522;border-color:#90a795}
-.search-shell span{font-size:28px;color:#6b806e}
-.search-shell input{width:100%;min-width:0;border:0;outline:0;box-shadow:none;background:transparent;font-size:17px;padding:14px 0}
-.hero-actions{display:flex;gap:12px;margin:24px 0 20px;flex-wrap:wrap;justify-content:center}
-.hero-actions button{border-radius:8px;padding:12px 22px}
-.quick-cats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.quick-cats button{background:transparent;color:#476b50;padding:8px;border:0;font-weight:500;text-decoration:underline;text-underline-offset:4px}
-.quick-cats button:hover{background:#eaf0e7}
-.results{padding-top:35px;padding-bottom:80px;scroll-margin-top:20px}
-.results-head{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:22px}
-.results-head h2{font-family:Georgia,serif;font-size:30px;margin:0 0 6px}
-.results-head select{background:white;min-width:170px}
-.recipe{transition:transform .15s,box-shadow .15s}
-.recipe:hover{transform:translateY(-3px);box-shadow:0 10px 25px #1b311520}
-footer{border-top:1px solid #e7e9e1;background:#fff}
-@media(max-width:600px){
-.topnav{height:68px}
-.brand{font-size:15px}
-.topnav button{font-size:13px;padding:10px}
-.hero{min-height:480px;padding:75px 18px 55px}
-.hero p{font-size:15px}
-.hero-actions{gap:8px}
-.hero-actions button{font-size:14px}
+
+* {
+  box-sizing: border-box;
 }
-@media print{.topnav,.hero,.results,footer{display:none!important}}
-</style>
-<style id="v5-slideshow">
-.hero{position:relative;isolation:isolate;min-height:620px;justify-content:center;overflow:hidden;background:#273526}
-.hero-slides,.hero-shade{position:absolute;inset:0;z-index:-1;pointer-events:none}
-.hero-slide{position:absolute;inset:0;opacity:0;background-position:center;background-size:cover;transform:scale(1.045);transition:opacity 1.8s ease,transform 8s linear}
-.hero-slide.active{opacity:1;transform:scale(1)}
-.hero-shade{background:linear-gradient(90deg,rgba(15,25,17,.73),rgba(20,30,20,.46),rgba(15,25,17,.68))}
-.hero h1{color:#fff;text-shadow:0 2px 18px #0005}
-.hero p{color:#f7f1e8;text-shadow:0 2px 10px #0008}
-.hero-mark{filter:drop-shadow(0 2px 8px #0008)}
-.hero .quick-cats button{color:#fff;text-shadow:0 1px 8px #000b}
-.hero .quick-cats button:hover{background:#ffffff2a}
-.hero .search-shell{box-shadow:0 12px 40px #0004}
-.hero .hero-actions .ghost{background:#fff;color:#36513b}
-@media(max-width:600px){.hero{min-height:570px;padding:75px 18px}}
-@media(prefers-reduced-motion:reduce){.hero-slide{transition:none;transform:none!important}}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button, a.button {
+  cursor: pointer;
+}
+
+.topbar {
+  background: white;
+  min-height: 72px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 5%;
+  gap: 15px;
+}
+
+.brand {
+  color: var(--green);
+  font-family: Georgia, serif;
+  font-size: 21px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.button {
+  display: inline-block;
+  border: none;
+  border-radius: 9px;
+  background: var(--green);
+  color: white;
+  padding: 13px 20px;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+}
+
+.button:hover {
+  background: var(--green-dark);
+}
+
+.button.light {
+  background: #f5f3ec;
+  color: var(--green-dark);
+}
+
+.hero {
+  min-height: 600px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  isolation: isolate;
+  background: #283c2d;
+  color: white;
+  padding: 90px 20px;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 2s ease, transform 8s linear;
+  z-index: -2;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(16, 28, 18, 0.58);
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 760px;
+}
+
+.hero-icon {
+  font-size: 56px;
+  margin-bottom: 15px;
+}
+
+.hero h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(38px, 6vw, 68px);
+  font-weight: normal;
+  margin: 0 0 15px;
+  text-shadow: 0 3px 12px #0006;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  margin-bottom: 38px;
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 100px;
+  padding: 7px 20px;
+  box-shadow: 0 10px 40px #0004;
+  color: var(--green);
+  gap: 12px;
+}
+
+.search-icon {
+  font-size: 26px;
+}
+
+.search-wrap input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 16px 4px;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.categories {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.categories button {
+  border: 1px solid #ffffff69;
+  border-radius: 25px;
+  background: #ffffff20;
+  color: white;
+  padding: 9px 16px;
+}
+
+.categories button:hover {
+  background: #ffffff45;
+}
+
+.main-content {
+  max-width: 1150px;
+  margin: auto;
+  padding: 55px 20px 90px;
+}
+
+.section-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.section-top h2 {
+  font: normal 34px Georgia, serif;
+  margin: 0 0 10px;
+}
+
+.muted {
+  color: #6c796d;
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.controls select,
+.controls button {
+  padding: 11px 15px;
+  border-radius: 9px;
+  border: 1px solid #cbd4c9;
+  background: white;
+  color: var(--green);
+}
+
+.status {
+  padding: 15px;
+  border-radius: 10px;
+  background: var(--sage);
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.status.error {
+  background: #fce8e4;
+  color: #8a3027;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(250px, 1fr));
+  gap: 22px;
+}
+
+.recipe-card {
+  width: 100%;
+  border: 1px solid #e0e5dc;
+  border-radius: 15px;
+  background: white;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  color: var(--text);
+  box-shadow: 0 5px 18px #0000000d;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px #00000020;
+}
+
+.recipe-image {
+  height: 175px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    135deg, #e4ddc3, #d4e0ce
+  );
+  font-size: 55px;
+  overflow: hidden;
+}
+
+.recipe-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-info {
+  padding: 20px;
+}
+
+.recipe-info h3 {
+  font: normal 23px Georgia, serif;
+  margin: 10px 0;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--sage);
+  color: var(--green);
+  border-radius: 30px;
+  padding: 6px 11px;
+  font-size: 12px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 45px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  color: #687668;
+}
+
+dialog {
+  width: min(680px, calc(100% - 24px));
+  max-height: 90vh;
+  overflow: auto;
+  border: none;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 18px 70px #0005;
+}
+
+dialog::backdrop {
+  background: #16271ac0;
+}
+
+dialog h2 {
+  font: normal 34px Georgia, serif;
+  margin-top: 10px;
+}
+
+.dialog-image {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.recipe-text {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+footer {
+  text-align: center;
+  padding: 35px 15px;
+  border-top: 1px solid #e4e7e0;
+  background: white;
+  color: #6d786c;
+}
+
+footer a {
+  color: var(--green);
+  margin: 0 10px;
+}
+
+@media(max-width: 600px) {
+  .brand { font-size: 17px; }
+  .topbar .button { padding: 11px; font-size: 13px; }
+  .hero { min-height: 560px; }
+  .hero-subtitle { font-size: 15px; }
+  .search-wrap input { font-size: 15px; }
+  .main-content { padding-top: 35px; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  .slide {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+@media print {
+  .topbar, .hero, .main-content,
+  footer, .dialog-actions {
+    display: none !important;
+  }
+  dialog {
+    position: static;
+    width: 100%;
+    max-height: none;
+    box-shadow: none;
+    border: none;
+  }
+  dialog::backdrop { display: none; }
+}
 </style>
 </head>
+
 <body>
 
-<nav class="topnav">
-  <a class="brand" href="#top">▤ <span>The Family Recipe Box</span></a>
-  <button id="add" type="button">+ Add a Recipe</button>
-</nav>
+<header class="topbar">
+  <a href="#" class="brand">📖 The Family Recipe Box</a>
 
-<main id="top">
-  <section class="hero">
-    <div class="hero-slides" aria-hidden="true">
-      <div class="hero-slide active"></div>
-      <div class="hero-slide"></div>
-      <div class="hero-slide"></div>
-      <div class="hero-slide"></div>
-      <div class="hero-slide"></div>
-    </div>
-    <div class="hero-shade" aria-hidden="true"></div>
-    <div class="hero-mark" aria-hidden="true">📖</div>
+  <a
+    class="button"
+    id="topAddRecipe"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    + Add a Recipe
+  </a>
+</header>
+
+<section class="hero">
+
+  <div class="slide active"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+  <div class="slide"></div>
+
+  <div class="hero-content">
+
+    <div class="hero-icon">📖</div>
+
     <h1>The Family Recipe Box</h1>
-    <p>Family recipes. Shared memories. Made with love.</p>
-    <div class="search-shell">
-      <span aria-hidden="true">⌕</span>
-      <input id="search" type="search" aria-label="Search family recipes" placeholder="Search recipes, ingredients, or family names…" autocomplete="off">
+
+    <p class="hero-subtitle">
+      Family recipes. Shared memories. Made with love.
+    </p>
+
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+
+      <input
+        type="search"
+        id="recipeSearch"
+        placeholder="Search recipes or family members..."
+        aria-label="Search family recipes"
+        autocomplete="off"
+      >
     </div>
-    <div class="hero-actions">
-      <button id="searchGo" type="button">Search Recipes</button>
-      <button id="browseAll" type="button" class="ghost">Browse All Recipes</button>
+
+    <div class="hero-buttons">
+      <button class="button" id="searchButton">
+        Search Recipes
+      </button>
+
+      <button class="button light" id="browseButton">
+        Browse All Recipes
+      </button>
     </div>
-    <div class="quick-cats">
-      <button type="button" data-cat="Desserts">Desserts</button>
-      <button type="button" data-cat="Dinner">Dinner</button>
-      <button type="button" data-cat="Breakfast">Breakfast</button>
-      <button type="button" data-cat="Holiday Favorites">Holiday Favorites</button>
+
+    <div class="categories">
+      <button data-category="Desserts">Desserts</button>
+      <button data-category="Dinner">Dinner</button>
+      <button data-category="Breakfast">Breakfast</button>
+      <button data-category="Holiday Favorites">
+        Holiday Favorites
+      </button>
     </div>
-  </section>
-  <section class="results wrap" id="results">
-    <div class="results-head">
-      <div>
-        <h2>Family Recipes</h2>
-        <p id="count" class="muted"></p>
-      </div>
-      <select id="category" aria-label="Filter category">
-        <option value="">All categories</option>
+
+  </div>
+</section>
+
+<main class="main-content" id="results">
+
+  <div class="section-top">
+
+    <div>
+      <h2>Our Family Recipes</h2>
+      <p class="muted" id="recipeCount">
+        Loading recipes...
+      </p>
+    </div>
+
+    <div class="controls">
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
       </select>
+
+      <button id="refreshButton">
+        ↻ Refresh Recipes
+      </button>
     </div>
-    <p id="status" class="status" role="status"></p>
-    <section id="grid" class="grid"></section>
-  </section>
+
+  </div>
+
+  <div id="status" class="status">
+    Connecting to our family recipe collection...
+  </div>
+
+  <div class="recipe-grid" id="recipeGrid"></div>
+
 </main>
 
+<dialog id="recipeDialog">
+
+  <div id="recipeDetails"></div>
+
+  <div class="dialog-actions">
+    <button class="button light" id="closeDialog">
+      Close
+    </button>
+
+    <a
+      class="button light"
+      id="changeLink"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Request a Change
+    </a>
+
+    <button class="button" id="printRecipe">
+      Print Recipe
+    </button>
+  </div>
+
+</dialog>
+
 <footer>
-  Made for sharing, one family recipe at a time.
-  <button class="ghost" id="adminOpen" type="button">Administrator</button>
-</footer>
+  <p>Made for sharing, one family recipe at a time.</p>
 
-<dialog id="addDialog">
-  <h2>Add a Family Recipe</h2>
-  <form id="recipeForm" class="form">
-    <label>Recipe name *<input name="title" required maxlength="120"></label>
-    <label>Your name *<input name="author" required maxlength="80"></label>
-    <label>Category *
-      <select name="category" required>
-        <option>Dinner</option><option>Breakfast</option><option>Lunch</option>
-        <option>Desserts</option><option>Side Dishes</option><option>Appetizers</option>
-        <option>Soups</option><option>Holiday Favorites</option><option>Other</option>
-      </select>
-    </label>
-    <label>Prep time<input name="prep" placeholder="e.g. 15 minutes" maxlength="50"></label>
-    <label>Cook time<input name="cook" placeholder="e.g. 40 minutes" maxlength="50"></label>
-    <label>Servings<input name="servings" placeholder="e.g. 6" maxlength="40"></label>
-    <label>Ingredients * (one per line)<textarea name="ingredients" required></textarea></label>
-    <label>Instructions *<textarea name="instructions" required></textarea></label>
-    <label>Family story (optional)<textarea name="story"></textarea></label>
-    <label>Recipe photo (optional, JPEG, PNG or WebP, maximum 5 MB)
-      <input type="file" name="photo" accept="image/jpeg,image/png,image/webp">
-    </label>
-    <div class="actions">
-      <button type="button" class="ghost" id="cancelAdd">Cancel</button>
-      <button type="submit">Save Recipe</button>
-    </div>
-  </form>
-</dialog>
+  <a
+    id="footerAddRecipe"
+    target="_blank"
+    rel="noopener noreferrer"
+  >Add a Recipe</a>
 
-<dialog id="detailDialog">
-  <div id="detail"></div>
-  <div class="actions">
-    <button class="ghost" id="closeDetail">Close</button>
-    <button class="ghost" id="requestChange">Request a Change</button>
-    <button id="print">Print Recipe</button>
-  </div>
-</dialog>
-
-<dialog id="requestDialog">
-  <h2>Request a Recipe Change</h2>
-  <p class="muted" id="requestTitle"></p>
-  <form id="requestForm" class="form">
-    <label>Your name *
-      <input name="requester" minlength="2" maxlength="80" required>
-    </label>
-    <label>What needs to change? *
-      <textarea name="message" minlength="10" maxlength="3000" required placeholder="Tell the administrator what is incorrect and what it should say."></textarea>
-    </label>
-    <div class="actions">
-      <button type="button" class="ghost" id="cancelRequest">Cancel</button>
-      <button type="submit">Send Request</button>
-    </div>
-  </form>
-</dialog>
-
-<dialog id="adminDialog">
-  <h2>Administrator Dashboard</h2>
-  <p id="adminStatus" class="status">Sign in to manage recipe change requests.</p>
-  <div id="adminLogin">
-    <form id="loginForm" class="form">
-      <label>Administrator email
-        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
-      </label>
-      <button type="submit">Send Sign-in Link</button>
-    </form>
-  </div>
-  <div id="adminWorkspace" class="hide">
-    <div class="actions">
-      <button class="ghost" id="adminRefresh">Refresh Requests</button>
-      <button class="ghost" id="adminSignOut">Sign Out</button>
-    </div>
-    <div id="adminRequests"></div>
-  </div>
-  <div class="actions">
-    <button class="ghost" id="adminClose">Close</button>
-  </div>
-</dialog>
-
-<dialog id="editDialog">
-  <h2>Correct Recipe</h2>
-  <form id="editForm" class="form">
-    <label>Recipe title<input name="title" required minlength="3" maxlength="120"></label>
-    <label>Contributor<input name="author" required minlength="2" maxlength="80"></label>
-    <label>Category<select name="category" id="editCategory"></select></label>
-    <label>Prep time<input name="prep" maxlength="50"></label>
-    <label>Cook time<input name="cook" maxlength="50"></label>
-    <label>Servings<input name="servings" maxlength="40"></label>
-    <label>Ingredients<textarea name="ingredients" required></textarea></label>
-    <label>Instructions<textarea name="instructions" required></textarea></label>
-    <label>Family story<textarea name="story"></textarea></label>
-    <div class="actions">
-      <button type="button" class="ghost" id="editCancel">Cancel</button>
-      <button type="submit">Save Correction</button>
-    </div>
-  </form>
-</dialog>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script>
-
-const cats=['Dinner','Breakfast','Lunch','Desserts','Side Dishes','Appetizers','Soups','Holiday Favorites','Other'];
-const $=id=>document.getElementById(id);
-const config=window.RECIPE_BOX_CONFIG||{};
-const configured=Boolean(config.supabaseUrl && config.supabaseAnonKey && !config.supabaseUrl.includes('YOUR_'));
-const db=configured&&window.supabase?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey):null;
-let recipes=[];
-let selectedRecipeId=null;
-let editingRecipeId=null;
-let adminSession=null;
-
-function escapeHTML(s){
-  return String(s??'').replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]))
-}
-function status(message,error=false){
-  $('status').textContent=message;
-  $('status').className='status'+(error?' error':'')
-}
-function photoURL(path){
-  if(!db||!path)return '';
-  return db.storage.from('recipe-photos').getPublicUrl(path).data.publicUrl
-}
-function render(){
-  const term=$('search').value.toLowerCase().trim(),cat=$('category').value;
-  const list=recipes.filter(r=>(!cat||r.category===cat)&&term.split(/\s+/).every(word=>
-    [r.title,r.author,r.ingredients,r.story,r.category].join(' ').toLowerCase().includes(word)
-  ));
-  $('count').textContent=`${list.length} recipe${list.length===1?'':'s'} found`;
-  $('grid').innerHTML=list.length?list.map(r=>`
-    <article class="recipe" data-id="${escapeHTML(r.id)}" tabindex="0" role="button">
-      <div class="art">
-        ${r.photo_path
-          ?`<img loading="lazy" src="${escapeHTML(photoURL(r.photo_path))}" alt="${escapeHTML(r.title)}">`
-          :r.category==='Desserts'?'🥧':r.category==='Breakfast'?'🥞':r.category==='Soups'?'🥣':'🍲'}
-      </div>
-      <div class="content">
-        <span class="tag">${escapeHTML(r.category)}</span>
-        <h3>${escapeHTML(r.title)}</h3>
-        <div class="muted">Shared by ${escapeHTML(r.author)}</div>
-      </div>
-    </article>
-  `).join(''):'<div class="empty">No recipes found. Add a family favorite!</div>'
-}
-async function load(){
-  if(!db){
-    status('Setup needed: connect your Supabase project in config.js to enable shared recipes.',true);
-    render();
-    return
-  }
-  status('Loading family recipes…');
-  const {data,error}=await db.from('recipes').select('*').order('created_at',{ascending:false}).limit(1000);
-  if(error){
-    status('Could not load recipes: '+error.message,true);
-    return
-  }
-  recipes=data||[];
-  status('Shared family cookbook is connected. Everyone with the link can add recipes.');
-  render()
-}
-cats.forEach(c=>$('category').add(new Option(c,c)));
-$('search').addEventListener('input',render);
-$('category').addEventListener('change',render);
-$('add').onclick=()=>$('addDialog').showModal();
-$('cancelAdd').onclick=()=>$('addDialog').close();
-
-$('recipeForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!db){
-    status('Connect Supabase before adding recipes.',true);
-    $('addDialog').close();
-    return
-  }
-  const form=e.target,button=form.querySelector('[type=submit]');
-  button.disabled=true;
-  button.textContent='Saving…';
-  try{
-    const fd=new FormData(form),photo=fd.get('photo');
-    let path=null;
-    if(photo&&photo.size){
-      if(photo.size>5*1024*1024)throw Error('Photo must be smaller than 5 MB.');
-      const types={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
-      if(!types[photo.type])throw Error('Only JPEG, PNG, and WebP photos are supported.');
-      path=crypto.randomUUID()+'.'+types[photo.type];
-      const upload=await db.storage.from('recipe-photos').upload(path,photo,{contentType:photo.type,upsert:false});
-      if(upload.error)throw upload.error
-    }
-    const record={
-      title:String(fd.get('title')).trim(),
-      author:String(fd.get('author')).trim(),
-      category:fd.get('category'),
-      prep:fd.get('prep'),
-      cook:fd.get('cook'),
-      servings:fd.get('servings'),
-      ingredients:fd.get('ingredients'),
-      instructions:fd.get('instructions'),
-      story:fd.get('story'),
-      photo_path:path
-    };
-    const result=await db.from('recipes').insert(record);
-    if(result.error)throw result.error;
-    form.reset();
-    $('addDialog').close();
-    await load();
-    status('Recipe saved! It is now available to the family.')
-  }catch(err){
-    status('Could not save recipe: '+err.message,true)
-  }finally{
-    button.disabled=false;
-    button.textContent='Save Recipe'
-  }
-};
-  function openRecipe(id){
-  selectedRecipeId=id;
-  const r=recipes.find(r=>r.id===id);
-  if(!r)return;
-
-  $('detail').innerHTML=`
-    <h2>${escapeHTML(r.title)}</h2>
-    ${r.photo_path?`<img class="photo" src="${escapeHTML(photoURL(r.photo_path))}" alt="${escapeHTML(r.title)}">`:''}
-    <p class="muted">${escapeHTML(r.category)} · Shared by ${escapeHTML(r.author)}</p>
-    <p>${escapeHTML([
-      r.prep&&'Prep: '+r.prep,
-      r.cook&&'Cook: '+r.cook,
-      r.servings&&'Serves: '+r.servings
-    ].filter(Boolean).join(' · '))}</p>
-    <h3>Ingredients</h3>
-    <div class="detail">${escapeHTML(r.ingredients)}</div>
-    <h3>Instructions</h3>
-    <div class="detail">${escapeHTML(r.instructions)}</div>
-    ${r.story?`<h3>Family Story</h3><div class="detail">${escapeHTML(r.story)}</div>`:''}
-  `;
-  $('detailDialog').showModal()
-}
-
-$('grid').onclick=e=>{
-  const el=e.target.closest('[data-id]');
-  if(el)openRecipe(el.dataset.id)
-};
-
-$('grid').onkeydown=e=>{
-  if(e.key==='Enter'||e.key===' '){
-    const el=e.target.closest('[data-id]');
-    if(el){
-      e.preventDefault();
-      openRecipe(el.dataset.id)
-    }
-  }
-};
-
-$('closeDetail').onclick=()=>$('detailDialog').close();
-$('print').onclick=()=>window.print();
-
-$('requestChange').onclick=()=>{
-  if(!selectedRecipeId)return;
-  const r=recipes.find(x=>x.id===selectedRecipeId);
-  $('requestTitle').textContent=r?`For: ${r.title} — ${r.author}`:'';
-  $('detailDialog').close();
-  $('requestDialog').showModal()
-};
-
-$('cancelRequest').onclick=()=>$('requestDialog').close();
-
-$('requestForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!db){
-    alert('Database setup is required.');
-    return
-  }
-
-  const f=e.target,button=f.querySelector('[type=submit]');
-  button.disabled=true;
-
-  try{
-    const fd=new FormData(f);
-    const {error}=await db.from('edit_requests').insert({
-      recipe_id:selectedRecipeId,
-      requester:String(fd.get('requester')).trim(),
-      message:String(fd.get('message')).trim()
-    });
-    if(error)throw error;
-
-    f.reset();
-    $('requestDialog').close();
-    status('Your correction request was sent to the administrator. The recipe has not changed.')
-  }catch(err){
-    alert('Could not submit request: '+err.message)
-  }finally{
-    button.disabled=false
-  }
-};
-
-function adminMessage(message,error=false){
-  $('adminStatus').textContent=message;
-  $('adminStatus').className='status'+(error?' error':'')
-}
-
-async function verifyAdmin(){
-  if(!db)return false;
-  const {data,error}=await db.rpc('is_recipe_admin');
-  if(error||!data){
-    adminMessage('This account is not authorized as an administrator.',true);
-    return false
-  }
-  return true
-}
-
-async function updateAdminUI(){
-  if(!db){
-    adminMessage('Connect Supabase in config.js first.',true);
-    return
-  }
-
-  const {data}=await db.auth.getSession();
-  adminSession=data?.session||null;
-  const allowed=adminSession?await verifyAdmin():false;
-
-  $('adminLogin').classList.toggle('hide',allowed);
-  $('adminWorkspace').classList.toggle('hide',!allowed);
-
-  if(allowed){
-    adminMessage('Signed in as '+adminSession.user.email);
-    await loadRequests()
-  }else if(!adminSession){
-    adminMessage('Sign in with your administrator email to review correction requests.')
-  }
-}
-
-$('adminOpen').onclick=()=>{
-  $('adminDialog').showModal();
-  updateAdminUI()
-};
-
-$('adminClose').onclick=()=>$('adminDialog').close();
-
-$('loginForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!db){
-    adminMessage('Connect Supabase first.',true);
-    return
-  }
-
-  const email=String(new FormData(e.target).get('email')).trim();
-  const {error}=await db.auth.signInWithOtp({
-    email,
-    options:{
-      emailRedirectTo:location.origin+location.pathname,
-      shouldCreateUser:true
-    }
-  });
-
-  adminMessage(
-    error?'Unable to send link: '+error.message:
-    'Check your email for the sign-in link. Only an authorized administrator can access requests.',
-    !!error
-  )
-};
-
-$('adminSignOut').onclick=async()=>{
-  await db.auth.signOut();
-  adminSession=null;
-  updateAdminUI()
-};
-
-$('adminRefresh').onclick=loadRequests;
-
-async function loadRequests(){
-  const {data,error}=await db.from('edit_requests')
-    .select('id,recipe_id,requester,message,status,created_at')
-    .order('created_at',{ascending:false})
-    .limit(500);
-
-  if(error){
-    adminMessage('Unable to load requests: '+error.message,true);
-    return
-  }
-
-  const pending=(data||[]).filter(r=>r.status==='pending');
-
-  $('adminRequests').innerHTML=`
-    <h3>Pending requests (${pending.length})</h3>
-  `+(
-    pending.length?pending.map(r=>{
-      const recipe=recipes.find(x=>x.id===r.recipe_id);
-      return `
-        <div class="request-card" data-request="${escapeHTML(r.id)}">
-          <strong>${escapeHTML(recipe?.title||'Recipe unavailable')}</strong>
-          <p class="muted">
-            From ${escapeHTML(r.requester)} · ${escapeHTML(new Date(r.created_at).toLocaleDateString())}
-          </p>
-          <p>${escapeHTML(r.message)}</p>
-          <div class="actions">
-            <button data-action="edit" data-recipe="${escapeHTML(r.recipe_id)}">Edit Recipe</button>
-            <button data-action="approved" class="ghost">Mark Approved</button>
-            <button data-action="rejected" class="ghost">Reject</button>
-          </div>
-        </div>
-      `
-    }).join(''):
-    '<p class="muted">No pending correction requests.</p>'
-  )+`
-    <p class="muted">
-      ${(data||[]).filter(r=>r.status!=='pending').length} previously reviewed request(s).
-    </p>
-  `
-}
-
-$('adminRequests').onclick=async e=>{
-  const b=e.target.closest('button[data-action]');
-  if(!b)return;
-
-  const action=b.dataset.action;
-
-  if(action==='edit'){
-    openEdit(b.dataset.recipe);
-    return
-  }
-
-  const id=b.closest('[data-request]').dataset.request;
-
-  if(!confirm(`Mark this request ${action}? This does not automatically change the recipe.`))return;
-
-  b.disabled=true;
-
-  const {error}=await db.from('edit_requests').update({
-    status:action,
-    reviewed_at:new Date().toISOString()
-  }).eq('id',id);
-
-  if(error){
-    alert(error.message);
-    b.disabled=false;
-    return
-  }
-
-  await loadRequests()
-};
-
-cats.forEach(c=>$('editCategory').add(new Option(c,c)));
-
-function openEdit(id){
-  const r=recipes.find(x=>x.id===id);
-
-  if(!r){
-    alert('Recipe not found. Refresh the page.');
-    return
-  }
-
-  editingRecipeId=id;
-  const f=$('editForm');
-
-  for(const field of [
-    'title','author','category','prep','cook',
-    'servings','ingredients','instructions','story'
-  ]){
-    f.elements[field].value=r[field]||''
-  }
-
-  $('editDialog').showModal()
-}
-
-$('editCancel').onclick=()=>$('editDialog').close();
-
-$('editForm').onsubmit=async e=>{
-  e.preventDefault();
-
-  const f=e.target,b=f.querySelector('[type=submit]');
-  b.disabled=true;
-
-  try{
-    const fd=new FormData(f),record={};
-
-    for(const field of [
-      'title','author','category','prep','cook',
-      'servings','ingredients','instructions','story'
-    ]){
-      record[field]=String(fd.get(field)||'').trim()
-    }
-
-    const {error}=await db.from('recipes')
-      .update(record)
-      .eq('id',editingRecipeId);
-
-    if(error)throw error;
-
-    $('editDialog').close();
-    await load();
-    await loadRequests();
-
-    adminMessage('Correction saved. Review the related request and mark it approved when finished.')
-  }catch(err){
-    alert('Unable to save: '+err.message)
-  }finally{
-    b.disabled=false
-  }
-};
-
-if(db){
-  db.auth.onAuthStateChange(()=>{
-    if($('adminDialog').open)setTimeout(updateAdminUI,0)
-  })
-}
-
-load();
-
-</script>
+  <a
+    id="footerAdmin"
+    target="_blank"
+    rel="noopener noreferrer"
+  >Administrator</a>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.5.3/papaparse.min.js"></script>
 
 <script>
-document.getElementById('searchGo').addEventListener('click',()=>{
-  document.getElementById('results').scrollIntoView({behavior:'smooth'})
-});
+// ===========================================
+// THE FAMILY RECIPE BOX
+// Google Sheets Integration
+// ===========================================
 
-document.getElementById('browseAll').addEventListener('click',()=>{
-  document.getElementById('search').value='';
-  document.getElementById('search').dispatchEvent(new Event('input',{bubbles:true}));
-  document.getElementById('category').value='';
-  document.getElementById('category').dispatchEvent(new Event('change',{bubbles:true}));
-  document.getElementById('results').scrollIntoView({behavior:'smooth'});
-});
+// Published recipe spreadsheet, Form Responses 1
+const RECIPE_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/" +
+  "2PACX-1vTZtuerLQIRIolsO0NOBzJTxQSNC_iY7pIaFGzzdPmvwN1a19ncfFQ9ySWsuuuHnteSobo_S5_vNLM9" +
+  "/pub?gid=1445592232&single=true&output=csv";
 
-document.querySelectorAll('[data-cat]').forEach(btn=>
-  btn.addEventListener('click',()=>{
-    document.getElementById('search').value='';
-    document.getElementById('search').dispatchEvent(new Event('input',{bubbles:true}));
-    document.getElementById('category').value=btn.dataset.cat;
-    document.getElementById('category').dispatchEvent(new Event('change',{bubbles:true}));
-    document.getElementById('results').scrollIntoView({behavior:'smooth'});
-  })
-);
+// Working Google Form for adding recipes
+const ADD_RECIPE_URL =
+  "https://docs.google.com/forms/d/e/" +
+  "1FAIpQLSfx_Arz0pz7ggKSngkFQvwGfIBA1z_meJYhiBQP1TupkOvmBQ/viewform";
 
-document.getElementById('search').addEventListener('keydown',e=>{
-  if(e.key==='Enter')
-    document.getElementById('results').scrollIntoView({behavior:'smooth'});
-});
-</script>
+// Working Google Form for requesting corrections
+const REQUEST_CHANGE_URL =
+  "https://docs.google.com/forms/d/e/" +
+  "1FAIpQLSeTtEexX77aV5ukA0eL1NvSQLjCDBrAvWGco7xHMreO0ZoB3w/viewform";
 
-<script id="v5-rotating-photos">
+// Private administrator spreadsheet
+const ADMIN_URL =
+  "https://docs.google.com/spreadsheets/d/" +
+  "1HXpUXJvhlhMxOSvldRcDCoWVAaCSR6GUTlu4VjtWHjc/edit";
 
-// Replace these URLs with your own family food photos whenever you like.
-const familyFoodPhotos = [
-  'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=2000&q=85', // cookies
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=85', // celebration meal
-  'https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=2000&q=85', // pie
-  'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=2000&q=85', // pasta
-  'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=2000&q=85'  // plated food
+// ===========================================
+// ROTATING FOOD BACKGROUND
+// ===========================================
+
+const backgroundPhotos = [
+  // Cookies
+  "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=2000&q=85",
+
+  // Thanksgiving turkey
+  "https://unsplash.com/photos/kEwZW6V6yLM/download?force=true&w=2000",
+
+  // Homemade pie
+  "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=2000&q=85",
+
+  // Pasta
+  "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=2000&q=85",
+
+  // Fresh family meal
+  "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=2000&q=85"
 ];
 
-const slideEls=[...document.querySelectorAll('.hero-slide')];
+const slides = [...document.querySelectorAll(".slide")];
 
-slideEls.forEach((el,i)=>{
-  el.style.backgroundImage=`url("${familyFoodPhotos[i]}")`
+slides.forEach((slide, i) => {
+  slide.style.backgroundImage =
+    `url("${backgroundPhotos[i]}")`;
 });
 
-if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  let activeSlide=0;
-  setInterval(()=>{
-    slideEls[activeSlide].classList.remove('active');
-    activeSlide=(activeSlide+1)%slideEls.length;
-    slideEls[activeSlide].classList.add('active')
-  },7000);
+let activeSlide = 0;
+
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  setInterval(() => {
+    slides[activeSlide].classList.remove("active");
+
+    activeSlide = (activeSlide + 1) % slides.length;
+
+    slides[activeSlide].classList.add("active");
+  }, 7000);
 }
 
+// ===========================================
+// WEBSITE LINKS
+// ===========================================
+
+document.getElementById("topAddRecipe").href =
+  ADD_RECIPE_URL;
+
+document.getElementById("footerAddRecipe").href =
+  ADD_RECIPE_URL;
+
+document.getElementById("footerAdmin").href =
+  ADMIN_URL;
+
+document.getElementById("changeLink").href =
+  REQUEST_CHANGE_URL;
+
+// ===========================================
+// RECIPE DATABASE
+// ===========================================
+
+const searchInput =
+  document.getElementById("recipeSearch");
+
+const recipeGrid =
+  document.getElementById("recipeGrid");
+
+const categoryFilter =
+  document.getElementById("categoryFilter");
+
+const recipeCount =
+  document.getElementById("recipeCount");
+
+const statusBox =
+  document.getElementById("status");
+
+const recipeDialog =
+  document.getElementById("recipeDialog");
+
+let allRecipes = [];
+
+// Escape text before inserting it into HTML
+function escapeHTML(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]
+  );
+}
+
+// Accept only ordinary web URLs for photos
+function safePhotoURL(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+
+    if (url.protocol === "https:" ||
+        url.protocol === "http:") {
+      return url.href;
+    }
+  } catch (error) {
+    return "";
+  }
+
+  return "";
+}
+
+function setStatus(message, isError = false) {
+  statusBox.textContent = message;
+  statusBox.className =
+    isError ? "status error" : "status";
+}
+
+// Load recipes from the published sheet
+async function loadRecipes() {
+  setStatus("Loading family recipes...");
+
+  try {
+    if (typeof Papa === "undefined") {
+      throw new Error(
+        "The CSV reader could not load. Check your internet connection."
+      );
+    }
+
+    const url =
+      RECIPE_CSV_URL + "&refresh=" + Date.now();
+
+    const response = await fetch(url, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        "Google Sheets returned error " +
+        response.status
+      );
+    }
+
+    const csvText = await response.text();
+
+    if (/^\s*</.test(csvText)) {
+      throw new Error(
+        "Google returned a webpage instead of CSV. " +
+        "Check that Form Responses 1 is published as CSV."
+      );
+    }
+
+    const parsed = Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: "greedy"
+    });
+
+    const headers = parsed.meta.fields || [];
+
+    if (
+      !headers.includes("Recipe Name") ||
+      !headers.includes("Contributor Name") ||
+      !headers.includes("Ingredients")
+    ) {
+      throw new Error(
+        "The published data is not the correct recipe tab. " +
+        "Publish Form Responses 1, not the whole spreadsheet."
+      );
+    }
+
+    allRecipes = parsed.data
+      .filter(row =>
+        String(row["Recipe Name"] || "").trim()
+      )
+      .map((row, index) => ({
+        id: index,
+
+        title: String(
+          row["Recipe Name"] || ""
+        ).trim(),
+
+        author: String(
+          row["Contributor Name"] || ""
+        ).trim(),
+
+        category: String(
+          row["Category"] || "Other"
+        ).trim(),
+
+        prep: String(
+          row["Prep Time"] || ""
+        ).trim(),
+
+        cook: String(
+          row["Cook Time"] || ""
+        ).trim(),
+
+        servings: String(
+          row["Servings or Yield"] || ""
+        ).trim(),
+
+        ingredients: String(
+          row["Ingredients"] || ""
+        ).trim(),
+
+        instructions: String(
+          row["Cooking Instructions"] || ""
+        ).trim(),
+
+        story: String(
+          row["Family Story or Special Notes"] || ""
+        ).trim(),
+
+        photo: String(
+          row["Recipe Photo Link (Optional)"] || ""
+        ).trim(),
+
+        date: String(
+          row["Timestamp"] || ""
+        ).trim()
+      }))
+      .reverse();
+
+    updateCategories();
+    renderRecipes();
+
+    setStatus(
+      "Recipe collection connected! " +
+      "Search by family member, recipe name, or ingredient."
+    );
+
+  } catch (error) {
+    console.error("Recipe loading error:", error);
+
+    setStatus(
+      "Could not load recipes: " + error.message,
+      true
+    );
+
+    recipeCount.textContent =
+      "Recipes unavailable";
+
+    recipeGrid.innerHTML = "";
+  }
+}
+
+// ===========================================
+// CATEGORY FILTERS
+// ===========================================
+
+function updateCategories() {
+  const previous = categoryFilter.value;
+
+  const categories = [
+    ...new Set(
+      allRecipes.map(r => r.category).filter(Boolean)
+    )
+  ].sort();
+
+  categoryFilter.innerHTML =
+    '<option value="">All Categories</option>';
+
+  categories.forEach(category => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+
+  if (categories.includes(previous)) {
+    categoryFilter.value = previous;
+  }
+}
+
+// ===========================================
+// SEARCH BY RECIPE AND FAMILY MEMBER
+// ===========================================
+
+function renderRecipes() {
+  const searchWords = searchInput.value
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const selectedCategory = categoryFilter.value;
+
+  const matchingRecipes = allRecipes.filter(recipe => {
+    const searchableText = [
+      recipe.title,
+      recipe.author,
+      recipe.category,
+      recipe.ingredients,
+      recipe.story
+    ].join(" ").toLowerCase();
+
+    const matchesSearch =
+      searchWords.every(word =>
+        searchableText.includes(word)
+      );
+
+    const matchesCategory =
+      !selectedCategory ||
+      recipe.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  recipeCount.textContent =
+    matchingRecipes.length +
+    (matchingRecipes.length === 1
+      ? " recipe found"
+      : " recipes found");
+
+  recipeGrid.innerHTML = "";
+
+  if (!matchingRecipes.length) {
+    recipeGrid.innerHTML = `
+      <div class="empty">
+        <h3>No recipes found</h3>
+        <p>
+          Try another recipe name, ingredient,
+          or family member.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  matchingRecipes.forEach(recipe => {
+    const card = document.createElement("button");
+
+    card.type = "button";
+    card.className = "recipe-card";
+
+    let emoji = "🍲";
+
+    const category = recipe.category.toLowerCase();
+
+    if (category.includes("dessert")) emoji = "🍪";
+    else if (category.includes("breakfast")) emoji = "🥞";
+    else if (category.includes("soup")) emoji = "🥣";
+    else if (category.includes("bread")) emoji = "🍞";
+    else if (category.includes("holiday")) emoji = "🦃";
+    else if (category.includes("appetizer")) emoji = "🧀";
+
+    const photoURL = safePhotoURL(recipe.photo);
+
+    const imageMarkup = photoURL
+      ? `<img src="${escapeHTML(photoURL)}"
+              alt="${escapeHTML(recipe.title)}"
+              loading="lazy">`
+      : emoji;
+
+    card.innerHTML = `
+      <div class="recipe-image">
+        ${imageMarkup}
+      </div>
+
+      <div class="recipe-info">
+        <span class="tag">
+          ${escapeHTML(recipe.category)}
+        </span>
+
+        <h3>${escapeHTML(recipe.title)}</h3>
+
+        <p class="muted">
+          Shared by ${escapeHTML(recipe.author)}
+        </p>
+      </div>
+    `;
+
+    const photo = card.querySelector("img");
+
+    if (photo) {
+      photo.addEventListener("error", () => {
+        photo.parentElement.textContent = emoji;
+      });
+    }
+
+    card.addEventListener("click", () => {
+      openRecipe(recipe);
+    });
+
+    recipeGrid.appendChild(card);
+  });
+}
+
+// ===========================================
+// RECIPE DETAILS
+// ===========================================
+
+function openRecipe(recipe) {
+  const details =
+    document.getElementById("recipeDetails");
+
+  const photoURL = safePhotoURL(recipe.photo);
+
+  let photoMarkup = "";
+
+  if (photoURL) {
+    photoMarkup = `
+      <img class="dialog-image"
+           src="${escapeHTML(photoURL)}"
+           alt="${escapeHTML(recipe.title)}">
+    `;
+  }
+
+  details.innerHTML = `
+    <h2>${escapeHTML(recipe.title)}</h2>
+
+    ${photoMarkup}
+
+    <p class="muted">
+      ${escapeHTML(recipe.category)}
+      — Shared by ${escapeHTML(recipe.author)}
+    </p>
+
+    <p>
+      ${recipe.prep
+        ? "<strong>Prep:</strong> " +
+          escapeHTML(recipe.prep) + "<br>"
+        : ""}
+
+      ${recipe.cook
+        ? "<strong>Cook:</strong> " +
+          escapeHTML(recipe.cook) + "<br>"
+        : ""}
+
+      ${recipe.servings
+        ? "<strong>Servings:</strong> " +
+          escapeHTML(recipe.servings)
+        : ""}
+    </p>
+
+    <h3>Ingredients</h3>
+    <div class="recipe-text">
+      ${escapeHTML(recipe.ingredients)}
+    </div>
+
+    <h3>Cooking Instructions</h3>
+    <div class="recipe-text">
+      ${escapeHTML(recipe.instructions)}
+    </div>
+
+    ${recipe.story
+      ? `
+        <h3>Family Story</h3>
+        <div class="recipe-text">
+          ${escapeHTML(recipe.story)}
+        </div>
+        `
+      : ""}
+  `;
+
+  recipeDialog.showModal();
+}
+
+// ===========================================
+// BUTTONS AND SEARCH EVENTS
+// ===========================================
+
+function scrollToRecipes() {
+  document.getElementById("results")
+    .scrollIntoView({ behavior: "smooth" });
+}
+
+searchInput.addEventListener("input", renderRecipes);
+
+searchInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    scrollToRecipes();
+  }
+});
+
+categoryFilter.addEventListener(
+  "change", renderRecipes
+);
+
+document.getElementById("searchButton")
+  .addEventListener("click", scrollToRecipes);
+
+document.getElementById("browseButton")
+  .addEventListener("click", () => {
+    searchInput.value = "";
+    categoryFilter.value = "";
+    renderRecipes();
+    scrollToRecipes();
+  });
+
+document.querySelectorAll("[data-category]")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      searchInput.value = "";
+      categoryFilter.value = button.dataset.category;
+
+      // If there are no recipes in that
+      // category yet, search for its name.
+      if (
+        ![...categoryFilter.options].some(
+          option => option.value === button.dataset.category
+        )
+      ) {
+        categoryFilter.value = "";
+        searchInput.value = button.dataset.category;
+      }
+
+      renderRecipes();
+      scrollToRecipes();
+    });
+  });
+
+document.getElementById("refreshButton")
+  .addEventListener("click", loadRecipes);
+
+document.getElementById("closeDialog")
+  .addEventListener("click", () => {
+    recipeDialog.close();
+  });
+
+document.getElementById("printRecipe")
+  .addEventListener("click", () => {
+    window.print();
+  });
+
+// ===========================================
+// START WEBSITE
+// ===========================================
+
+// Load the database when the page opens.
+loadRecipes();
+
+// Refresh recipe data periodically.
+setInterval(loadRecipes, 120000);
+
 </script>
+
 </body>
 </html>
+
+
+
+
+
+
+  
+</footer>
